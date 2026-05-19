@@ -16,7 +16,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -100,7 +99,6 @@ class _MyAppState extends State<MyApp> {
           importance: Importance.high,
           priority: Priority.high,
           playSound: true,
-          // icon: '@mipmap/ic_launcher',
         ),
         iOS: const DarwinNotificationDetails(
           presentAlert: true,
@@ -108,7 +106,6 @@ class _MyAppState extends State<MyApp> {
           presentSound: true,
         ),
       ),
-      // payload: 'Open from Local Notification',
     );
   }
 
