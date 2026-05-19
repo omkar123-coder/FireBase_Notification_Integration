@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
 import 'firebase_options.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -28,12 +27,13 @@ void main() async {
 }
 
 class NotificationRepository {
-  static AndroidNotificationChannel channel = const AndroidNotificationChannel(
+  static AndroidNotificationChannel channel = AndroidNotificationChannel(
     'channel_id',
     'channel_title',
     description: 'This channel is used for important notifications.',
     importance: Importance.high,
     playSound: true,
+    sound: RawResourceAndroidNotificationSound('notify'),
   );
 
   static Future<void> notificationPlugin() async {
@@ -89,8 +89,8 @@ class _MyAppState extends State<MyApp> {
 
     await flutterLocalNotificationsPlugin.show(
       0,
-      "Testing $counter",
-      "How you doing ?",
+      "Testing",
+      "Custom sound notification",
       NotificationDetails(
         android: AndroidNotificationDetails(
           NotificationRepository.channel.id,
@@ -99,11 +99,15 @@ class _MyAppState extends State<MyApp> {
           importance: Importance.high,
           priority: Priority.high,
           playSound: true,
+          sound: const RawResourceAndroidNotificationSound(
+            'notify',
+          ),
         ),
         iOS: const DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
           presentSound: true,
+          sound: 'dragon_studio_bird_wings_463212.mp3',
         ),
       ),
     );
