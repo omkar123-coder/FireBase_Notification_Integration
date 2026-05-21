@@ -1,14 +1,13 @@
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_notification_1/controller/notification_controller.dart';
+import 'package:flutter/material.dart';
+
 import 'firebase_options.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
-
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -21,66 +20,19 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+  await FirebaseMessaging.instance.requestPermission(
+    alert: true, badge: true, sound: true,
   );
 
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  await NotificationController.initializeNotifications();
 
-  await messaging.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-
-  String? token = await messaging.getToken();
-  log("FCM TOKEN: $token");
-
-  FirebaseMessaging.onBackgroundMessage(
-    _firebaseMessagingBackgroundHandler,
-  );
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    log("Message Receveied");
-
-    RemoteNotification? notification = message.notification;
-
-    if (notification != null) {
-      flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'high_importance_channel',
-            'High Importance Notifications',
-            importance: Importance.max,
-            priority: Priority.high,
-          ),
-        ),
-      );
-    }
+    NotificationController.showLocalNotification(message);
   });
-
-  FirebaseMessaging.onMessageOpenedApp.listen(
-    (RemoteMessage message) {
-      log("Notification clicked");
-
-      log("Title: ${message.notification?.title}");
-      log("Body: ${message.notification?.body}");
-    },
-  );
-
-  RemoteMessage? initialMessage =
-      await FirebaseMessaging.instance.getInitialMessage();
-
-  if (initialMessage != null) {
-    log("App opened from terminated state");
-
-    log("Title: ${initialMessage.notification?.title}");
-    log("Body: ${initialMessage.notification?.body}");
-  }
 
   runApp(const MyApp());
 }
