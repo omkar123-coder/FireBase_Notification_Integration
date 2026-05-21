@@ -30,7 +30,7 @@ class NotificationRepository {
   static AndroidNotificationChannel channel = AndroidNotificationChannel(
     'channel_id',
     'channel_title',
-    description: 'This channel is used for important notifications.',
+    description: 'This channel is used for important notification.',
     importance: Importance.high,
     playSound: true,
     sound: RawResourceAndroidNotificationSound('notify'),
