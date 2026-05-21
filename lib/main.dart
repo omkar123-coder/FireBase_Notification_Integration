@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_notification_1/controller/notification_controller.dart';
+import 'package:firebase_notification_1/screens/google_login_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+      home: const GoogleLoginScreen(),
     );
   }
 }
