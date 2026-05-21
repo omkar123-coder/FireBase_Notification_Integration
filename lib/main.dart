@@ -44,14 +44,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text("Firebase Notification"),
-        ),
-        body: const Center(
-          child: Text("FCM Working"),
-        ),
-      ),
+      home: const HomeScreen(),
     );
   }
 }
