@@ -14,9 +14,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  print("Background message received");
-  print("Title: ${message.notification?.title}");
-  print("Body: ${message.notification?.body}");
+  log("Background message received");
+  log("Title: ${message.notification?.title}");
+  log("Body: ${message.notification?.body}");
 }
 
 void main() async {
@@ -24,17 +24,6 @@ void main() async {
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  const AndroidInitializationSettings androidInitializationSettings =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-
-  const InitializationSettings initializationSettings = InitializationSettings(
-    android: androidInitializationSettings,
-  );
-
-  await flutterLocalNotificationsPlugin.initialize(
-    initializationSettings,
   );
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -53,7 +42,7 @@ void main() async {
   );
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print("Message Recevied");
+    log("Message Receveied");
 
     RemoteNotification? notification = message.notification;
 
@@ -74,13 +63,12 @@ void main() async {
     }
   });
 
-  // // Notification Clicked
   FirebaseMessaging.onMessageOpenedApp.listen(
     (RemoteMessage message) {
-      print("Notification clicked");
+      log("Notification clicked");
 
-      print("Title: ${message.notification?.title}");
-      print("Body: ${message.notification?.body}");
+      log("Title: ${message.notification?.title}");
+      log("Body: ${message.notification?.body}");
     },
   );
 
@@ -88,10 +76,10 @@ void main() async {
       await FirebaseMessaging.instance.getInitialMessage();
 
   if (initialMessage != null) {
-    print("App opened from terminated state");
+    log("App opened from terminated state");
 
-    print("Title: ${initialMessage.notification?.title}");
-    print("Body: ${initialMessage.notification?.body}");
+    log("Title: ${initialMessage.notification?.title}");
+    log("Body: ${initialMessage.notification?.body}");
   }
 
   runApp(const MyApp());
