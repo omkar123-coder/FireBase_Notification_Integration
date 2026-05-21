@@ -25,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -45,6 +39,16 @@ class DefaultFirebaseOptions {
         );
     }
   }
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCJ8bckTmrFnVXHih1QtmD4sEV-ENbepgk',
+    appId: '1:456220183612:web:1a98ab7ebcd3ae33ea4739',
+    messagingSenderId: '456220183612',
+    projectId: 'fcm4flutter-a3ef9',
+    authDomain: 'fcm4flutter-a3ef9.firebaseapp.com',
+    storageBucket: 'fcm4flutter-a3ef9.firebasestorage.app',
+    measurementId: 'G-C69Z46SMZ9',
+  );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDmqugpLu91WpLRB-Y-0tNs0p9jigiHKbo',
@@ -63,14 +67,22 @@ class DefaultFirebaseOptions {
     iosBundleId: 'com.example.firebaseNotification1',
   );
 
-  static const FirebaseOptions web = FirebaseOptions(
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyCDtHlTjp3-ZaEeVuO-j21wpAY6swLVVEg',
+    appId: '1:456220183612:ios:cf4ceb05b1d40d49ea4739',
+    messagingSenderId: '456220183612',
+    projectId: 'fcm4flutter-a3ef9',
+    storageBucket: 'fcm4flutter-a3ef9.firebasestorage.app',
+    iosBundleId: 'com.example.firebaseNotification1',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyCJ8bckTmrFnVXHih1QtmD4sEV-ENbepgk',
-    appId: '1:456220183612:web:1a98ab7ebcd3ae33ea4739',
+    appId: '1:456220183612:web:67229e7fc2dfc87aea4739',
     messagingSenderId: '456220183612',
     projectId: 'fcm4flutter-a3ef9',
     authDomain: 'fcm4flutter-a3ef9.firebaseapp.com',
     storageBucket: 'fcm4flutter-a3ef9.firebasestorage.app',
-    measurementId: 'G-C69Z46SMZ9',
+    measurementId: 'G-NQ9GSFSLYE',
   );
-
 }

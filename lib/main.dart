@@ -1,133 +1,104 @@
-import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/material.dart';
 import 'firebase_options.dart';
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-}
+import 'package:google_sign_in/google_sign_in.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  await NotificationRepository.notificationPlugin();
 
   runApp(const MyApp());
 }
 
-class NotificationRepository {
-  static AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'channel_id',
-    'channel_title',
-    description: 'This channel is used for important notification.',
-    importance: Importance.high,
-    playSound: true,
-    sound: RawResourceAndroidNotificationSound('notify'),
-  );
-
-  static Future<void> notificationPlugin() async {
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
-
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
-
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const DarwinInitializationSettings iosInitializationSettings =
-        DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
-
-    final InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: iosInitializationSettings,
-    );
-
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (details) async {
-        debugPrint("Notification clicked: ${details.payload}");
-      },
-    );
-  }
-}
-
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  int counter = 0;
-
-  Future<void> showNotification() async {
-    setState(() {
-      counter++;
-    });
-
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      "Testing",
-      "Custom sound notification",
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          NotificationRepository.channel.id,
-          NotificationRepository.channel.name,
-          channelDescription: NotificationRepository.channel.description,
-          importance: Importance.high,
-          priority: Priority.high,
-          playSound: true,
-          sound: const RawResourceAndroidNotificationSound(
-            'notify',
-          ),
-        ),
-        iOS: const DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-          sound: 'dragon_studio_bird_wings_463212.mp3',
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text("Firebase Notification"),
-        ),
-        body: Center(
-          child: ElevatedButton(
-            onPressed: showNotification,
-            child: const Text("Show Notification"),
+      home: const HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  Future<void> signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    if (googleUser == null) return;
+
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  Future<void> signOut() async {
+    await GoogleSignIn().signOut();
+    await FirebaseAuth.instance.signOut();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("Google Sign In"),
+              actions: [
+                IconButton(
+                  onPressed: signOut,
+                  icon: const Icon(Icons.logout),
+                ),
+              ],
+            ),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (snapshot.data!.photoURL != null)
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundImage: NetworkImage(snapshot.data!.photoURL!),
+                    ),
+                  const SizedBox(height: 20),
+                  Text(
+                    snapshot.data!.displayName ?? "",
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  Text(snapshot.data!.email ?? ""),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("Google Login"),
           ),
-        ),
-      ),
+          body: Center(
+            child: ElevatedButton(
+              onPressed: signInWithGoogle,
+              child: const Text("Sign In with Google"),
+            ),
+          ),
+        );
+      },
     );
   }
 }
